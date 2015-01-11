@@ -1,5 +1,6 @@
 module Puter
   class SyntaxError < Exception
+    attr_accessor :line
   end
 
   class Puterfile
@@ -14,9 +15,7 @@ module Puter
 
     class << self
       def from_path(path)
-        stuff = ReadFrom(path)
-
-        parse(stuff)
+        parse File.open(path, 'rb') { |f| f.read }
       end
 
       def parse(raw)
@@ -24,15 +23,24 @@ module Puter
         p.raw = raw
         p.lines = raw.to_s.split "\n"
         p.operations = parse_operations(p.lines)
-        p.from = 'balls'
+        p.from = p.operations[0][:data]
         p
       end
 
       def parse_operations(lines)
+        raise Puter::SyntaxError.new "File is empty.  First line must be a FROM command" if lines.length == 0
+
         ops = []
         previous_line = ""
-        lines.each do | line |
-          ops << parse_operation(line, previous_line)
+        lines.each_with_index do | line, i |
+          begin
+            ops << parse_operation(line, previous_line)
+            if i == 0
+              raise Puter::SyntaxError.new "First line must be a FROM command" unless ops[i][:operation] == FROM
+            end
+          rescue Puter::SyntaxError => se
+            raise Puter::SyntaxError.new "On line #{i+1}: #{se.message}"
+          end
           previous_line = line
         end
         ops

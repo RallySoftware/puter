@@ -1,0 +1,4 @@
+# can't comment line one - line one must be a FROM line
+FROM fixture1
+
+RUN touch /tmp/puter.txt

@@ -1,0 +1,3 @@
+FROM fixture1
+
+RUN touch /tmp/puter.txt

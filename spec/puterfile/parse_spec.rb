@@ -18,12 +18,7 @@ describe Puter::Puterfile do
 
       its(:raw) { should =~ /afile/ }
       its(:lines) { should include 'RUN echo foo' }
-      # its(:from) { should == 'scratch' }
-      # specify { subject.line[0].should be_from }
-      # specify { subject.line[1].should be_blank }
-      # specify { subject.line[2].should be_comment }
-      # specify { subject.line[3].should be_run }
-      # specify { subject.line[4].should be_add }
+      its(:from) { should == 'scratch' }
     end
   end
 end

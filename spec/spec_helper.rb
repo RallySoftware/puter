@@ -11,3 +11,9 @@ RSpec.configure do |c|
   c.formatter = :documentation
   c.color = true
 end
+
+class String
+  def unindent
+    gsub /^#{self[/\A\s*/]}/, ''
+  end
+end
