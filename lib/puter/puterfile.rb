@@ -4,6 +4,15 @@ module Puter
   end
 
   class Puterfile
+
+    attr_accessor :raw
+    attr_accessor :lines
+    attr_accessor :from
+    attr_accessor :operations
+    attr_accessor :executable_ops
+
+    BACKSLASH = "\\"
+
     FROM     = :from
     RUN      = :run
     ADD      = :add
@@ -23,6 +32,7 @@ module Puter
         p.raw = raw
         p.lines = raw.to_s.split "\n"
         p.operations = parse_operations(p.lines)
+        p.executable_ops = executable_operations(p.operations)
         p.from = p.operations[0][:data]
         p
       end
@@ -48,6 +58,7 @@ module Puter
 
       def parse_operation(line, previous_line="")
         op = {}
+        line = line.rstrip unless line.nil?
 
         case
         when line.nil?
@@ -57,18 +68,19 @@ module Puter
         when line.strip.empty?
           op[:operation] = BLANK
           op[:data]      = line
-
+          op[:continue]  = false
 
         # commented line
         when line =~ /\s*\#/
           op[:operation] = COMMENT
           op[:data]      = line
-
+          op[:continue]  = line[-1] == BACKSLASH
 
         # continuation of a previous line
-        when line =~ /\s/ && previous_line.strip[-1] == "\\"
+        when line =~ /\s/ && previous_line.rstrip[-1] == BACKSLASH
           op[:operation] = CONTINUE
-          op[:data]      = line
+          op[:data]      = line.lstrip
+          op[:continue]  = line[-1] == BACKSLASH
 
         # must be an operation (FROM, ADD, RUN, ...)
         else
@@ -80,17 +92,35 @@ module Puter
           raise SyntaxError.new "Operation [#{cmd.to_s.upcase}] has no data" if data.nil?
           op[:operation] = cmd
           op[:data]      = data
+          op[:continue]  = line[-1] == BACKSLASH
 
         end
+        op[:data][-1] = " " if op[:continue]
+
         op
       end
 
-    end
+      def executable_operations(operations)
+        execs = []
+        operations.each_with_index do |op, i|
+          case op[:operation]
+          when ADD, RUN
+            exec = {
+              :operation => op[:operation],
+              :data      => op[:data].dup
+            }
+            exec[:start_line] = i
+            exec[:end_line] = i
+            execs << exec
+          when CONTINUE
+            execs.last[:data] << op[:data]
+            execs.last[:end_line] = i
+          end
+        end
+        execs
+      end
 
-    attr_accessor :raw
-    attr_accessor :lines
-    attr_accessor :from
-    attr_accessor :operations
+    end
 
   end
 

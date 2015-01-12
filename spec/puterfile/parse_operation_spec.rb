@@ -13,41 +13,55 @@ describe Puter::Puterfile do
     context 'empty line' do
       subject { Puter::Puterfile.parse_operation("") }
       specify { expect(subject[:operation]).to eq(Puter::Puterfile::BLANK) }
+      specify { expect(subject[:continue]).to be_falsey }
     end
 
     context 'whitspace only line' do
       subject { Puter::Puterfile.parse_operation(" \t ") }
       specify { expect(subject[:operation]).to eq(Puter::Puterfile::BLANK) }
+      specify { expect(subject[:continue]).to be_falsey }
     end
 
     context 'comment line' do
       subject { Puter::Puterfile.parse_operation('# a comment') }
       specify { expect(subject[:operation]).to eq(Puter::Puterfile::COMMENT) }
       specify { expect(subject[:data]).to eq('# a comment') }
+      specify { expect(subject[:continue]).to be_falsey }
     end
 
     context 'comment line starting with whitespace' do
       subject { Puter::Puterfile.parse_operation('  # a comment') }
       specify { expect(subject[:operation]).to eq(Puter::Puterfile::COMMENT) }
       specify { expect(subject[:data]).to eq('  # a comment') }
+      specify { expect(subject[:continue]).to be_falsey }
     end
 
     context 'comment line after a continuation line' do
       subject { Puter::Puterfile.parse_operation('  # a comment', "  \\") }
       specify { expect(subject[:operation]).to eq(Puter::Puterfile::COMMENT) }
       specify { expect(subject[:data]).to eq('  # a comment') }
+      specify { expect(subject[:continue]).to be_falsey }
     end
 
     context 'non-comment line after a continuation line' do
       subject { Puter::Puterfile.parse_operation('  more', "  \\") }
       specify { expect(subject[:operation]).to eq(Puter::Puterfile::CONTINUE) }
-      specify { expect(subject[:data]).to eq('  more') }
+      specify { expect(subject[:data]).to eq('more') }
+      specify { expect(subject[:continue]).to be_falsey }
+    end
+
+    context 'line with a continuation' do
+      subject { Puter::Puterfile.parse_operation("RUN echo hello \\") }
+      specify { expect(subject[:operation]).to eq(Puter::Puterfile::RUN) }
+      specify { expect(subject[:data]).to eq('echo hello  ') }
+      specify { expect(subject[:continue]).to be_truthy }
     end
 
     context 'FROM' do
       subject { Puter::Puterfile.parse_operation('FROM  blah') }
       specify { expect(subject[:operation]).to eq(Puter::Puterfile::FROM) }
       specify { expect(subject[:data]).to eq('blah') }
+      specify { expect(subject[:continue]).to be_falsey }
     end
   end
 
@@ -61,10 +75,10 @@ describe Puter::Puterfile do
           RUN echo foo
           ADD afile
 
-          RUN continuation \\
+          RUN yum install \\
               # comment line in a continuation \\
-              next line \\
-              last line
+              package1 \\
+              package2
           EOF
       end
 
@@ -75,9 +89,29 @@ describe Puter::Puterfile do
       specify { expect(subject.operations[4][:operation]).to eq(Puter::Puterfile::ADD) }
       specify { expect(subject.operations[5][:operation]).to eq(Puter::Puterfile::BLANK) }
       specify { expect(subject.operations[6][:operation]).to eq(Puter::Puterfile::RUN) }
+      specify { expect(subject.operations[6][:data]).to eq('yum install  ') }
+      specify { expect(subject.operations[6][:continue]).to be_truthy }
       specify { expect(subject.operations[7][:operation]).to eq(Puter::Puterfile::COMMENT) }
       specify { expect(subject.operations[8][:operation]).to eq(Puter::Puterfile::CONTINUE) }
+      specify { expect(subject.operations[8][:data]).to eq('package1  ') }
+      specify { expect(subject.operations[8][:continue]).to be_truthy }
       specify { expect(subject.operations[9][:operation]).to eq(Puter::Puterfile::CONTINUE) }
+
+      specify { expect(subject.executable_ops.length).to eq(3) }
+      specify { expect(subject.executable_ops[0][:operation]).to eq(Puter::Puterfile::RUN) }
+      specify { expect(subject.executable_ops[0][:data]).to match(/echo foo/) }
+      specify { expect(subject.executable_ops[0][:start_line]).to eq(3) }
+      specify { expect(subject.executable_ops[0][:end_line]).to eq(3) }
+
+      specify { expect(subject.executable_ops[1][:operation]).to eq(Puter::Puterfile::ADD) }
+      specify { expect(subject.executable_ops[1][:data]).to match(/afile/) }
+      specify { expect(subject.executable_ops[1][:start_line]).to eq(4) }
+      specify { expect(subject.executable_ops[1][:end_line]).to eq(4) }
+
+      specify { expect(subject.executable_ops[2][:operation]).to eq(Puter::Puterfile::RUN) }
+      specify { expect(subject.executable_ops[2][:data]).to match(/yum install\s+package1\s+package2/) }
+      specify { expect(subject.executable_ops[2][:start_line]).to eq(6) }
+      specify { expect(subject.executable_ops[2][:end_line]).to eq(9) }
     end
 
     context 'should raise a syntax error with a line number' do
