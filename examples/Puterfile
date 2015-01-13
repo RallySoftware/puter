@@ -17,6 +17,7 @@ RUN touch /tmp/puter.txt && \
 RUN echo puter1 >> /tmp/puter.txt
 
 RUN echo complete
+RUN exit 3
 RUN false && \
     true
 RUN echo should not run >&2

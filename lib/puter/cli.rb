@@ -18,14 +18,15 @@ module Puter
         block.call
       rescue Puter::RunError => re
         Puter.ui.error re.message
-        Puter.ui.error re.result.inspect
+        Puter.ui.error "[ #{re.cmd} ] returned [ #{re.exit_status} ]"
         Puter.ui.error re.backtrace.join "\n"
+        exit re.exit_status
       rescue Exception => e
         Puter.ui.error e.message
         Puter.ui.error e.backtrace.join "\n"
-      ensure
         exit EXIT_CODE_ERR
       end
+      exit 0
     end
 
     class Cli < Thor

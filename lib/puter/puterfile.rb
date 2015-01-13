@@ -3,10 +3,19 @@ module Puter
   end
 
   class RunError < Exception
+    {:cmd=>"sudo -u root -s -- sh -c 'exit 3'", :stdout=>"", :stderr=>"", :exit_status=>3, :exit_signal=>nil}
+
     attr_accessor :result
+    attr_accessor :cmd
+    attr_accessor :exit_status
+    attr_accessor :exit_signal
+
     def initialize(message, result)
       super(message)
       @result = result
+      @cmd = result[:cmd]
+      @exit_status = result[:exit_status]
+      @exit_signal = result[:exit_signal]
     end
   end
 
