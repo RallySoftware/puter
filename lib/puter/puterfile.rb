@@ -1,6 +1,5 @@
 module Puter
   class SyntaxError < Exception
-    attr_accessor :line
   end
 
   class Puterfile
@@ -109,17 +108,51 @@ module Puter
               :operation => op[:operation],
               :data      => op[:data].dup
             }
-            exec[:start_line] = i
-            exec[:end_line] = i
+            exec[:start_line] = exec[:end_line] = i
             execs << exec
           when CONTINUE
             execs.last[:data] << op[:data]
             execs.last[:end_line] = i
           end
         end
+
+        execs.select { |e| e[:operation] == ADD }.each do |e|
+          e[:from], e[:to] = e[:data].strip.split /\s+/, 2
+          raise SyntaxError.new "ADD operation requires two parameters #{e.inspect}" if e[:from].nil? || e[:to].nil?
+        end
+
         execs
       end
 
+    end
+
+    def apply(context, backend)
+      dependency_check(context)
+
+      executable_ops.each do |op|
+        case op[:operation]
+        when ADD
+          backend.add path_in_context(op[:from], context), op[:to]
+        when RUN
+          backend.run op[:data]
+        else
+          raise "dunno what to do #{op.inspect}"
+        end
+      end
+    end
+
+    private
+    def path_in_context(path, context)
+      File.expand_path(path, context)
+    end
+
+    def dependency_check(context)
+      executable_ops.each do |op|
+        case op[:operation]
+        when ADD
+          File.open(path_in_context(op[:from], context), 'r') {}
+        end
+      end
     end
 
   end

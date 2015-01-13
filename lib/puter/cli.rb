@@ -6,6 +6,13 @@ module Puter
   module CLI
     EXIT_CODE_ERR = 1
 
+    SSH_OPTS = {}
+    SSH_OPTS[:user]                  =  ENV['SSH_USER'] || 'root'
+    SSH_OPTS[:password]              =  ENV['SSH_PASSWORD']         if ENV['SSH_PASSWORD']
+    SSH_OPTS[:port]                  =  ENV['SSH_PORT'].to_i        if ENV['SSH_PORT']
+    SSH_OPTS[:paranoid]              = (ENV['SSH_PARANOID'] == '1') if ENV['SSH_PARANOID']
+    SSH_OPTS[:user_known_hosts_file] =  ENV['SSH_KNOWN_HOSTS']      if ENV['SSH_KNOWN_HOSTS']
+
     def self.run_cli(&block)
       begin
         block.call

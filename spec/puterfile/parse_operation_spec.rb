@@ -73,12 +73,15 @@ describe Puter::Puterfile do
 
           # comment
           RUN echo foo
-          ADD afile
+          ADD afile tofile
 
           RUN yum install \\
               # comment line in a continuation \\
               package1 \\
               package2
+
+          ADD https://really/long/url/foo.tar.gz \\
+              /tmp/foo.tar.gz
           EOF
       end
 
@@ -97,7 +100,7 @@ describe Puter::Puterfile do
       specify { expect(subject.operations[8][:continue]).to be_truthy }
       specify { expect(subject.operations[9][:operation]).to eq(Puter::Puterfile::CONTINUE) }
 
-      specify { expect(subject.executable_ops.length).to eq(3) }
+      specify { expect(subject.executable_ops.length).to eq(4) }
       specify { expect(subject.executable_ops[0][:operation]).to eq(Puter::Puterfile::RUN) }
       specify { expect(subject.executable_ops[0][:data]).to match(/echo foo/) }
       specify { expect(subject.executable_ops[0][:start_line]).to eq(3) }
@@ -112,6 +115,12 @@ describe Puter::Puterfile do
       specify { expect(subject.executable_ops[2][:data]).to match(/yum install\s+package1\s+package2/) }
       specify { expect(subject.executable_ops[2][:start_line]).to eq(6) }
       specify { expect(subject.executable_ops[2][:end_line]).to eq(9) }
+
+      specify { expect(subject.executable_ops[3][:operation]).to eq(Puter::Puterfile::ADD) }
+      specify { expect(subject.executable_ops[3][:from]).to eq('https://really/long/url/foo.tar.gz') }
+      specify { expect(subject.executable_ops[3][:to]).to eq('/tmp/foo.tar.gz') }
+      specify { expect(subject.executable_ops[3][:start_line]).to eq(11) }
+      specify { expect(subject.executable_ops[3][:end_line]).to eq(12) }
     end
 
     context 'should raise a syntax error with a line number' do
@@ -127,6 +136,10 @@ describe Puter::Puterfile do
       end
 
       its(:message) { should match /line 2/ }
+    end
+
+    context 'should raise a syntax error when ADD operation lacks two parameters' do
+      specify { expect { Puter::Puterfile.parse("FROM foo\nADD just_one\n") }.to raise_error Puter::SyntaxError }
     end
 
     context 'when the first line is not a FROM command' do

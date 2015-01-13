@@ -1,0 +1,21 @@
+FROM c65.small
+#comment
+
+RUN touch /tmp/puter.txt
+RUN userdel -f puter1; useradd puter1
+RUN sudo -u puter1 whoami
+
+ADD localfile.txt /tmp/explicit_name.txt
+
+ADD localfile.txt \
+    /home/puter1/
+
+RUN touch /tmp/puter.txt && \
+      echo more commands > /tmp/puter.txt && \
+      echo done
+
+RUN echo puter1 >> /tmp/puter.txt
+
+RUN echo complete
+RUN false
+RUN echo should not run > /tmp/puter.txt
