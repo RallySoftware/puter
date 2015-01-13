@@ -14,7 +14,7 @@ module Puter
         @scp = Net::SCP.new(@ssh)
       end
 
-      def run(command, user='root')
+      def run(command, user='root', opts={}, &output)
         actual_cmd = "sudo -u #{user} -s -- sh -c '#{command}'"
         stdout_data = ''
         stderr_data = ''
@@ -22,6 +22,9 @@ module Puter
         exit_signal = nil
 
         @ssh.open_channel do |channel|
+          # TODO - make request_pty user controllable:
+          #          without a pty, RHEL default configs fail to allow sudo
+          #          with a pty, openssh comingles stdout and stderr onto stdout
           channel.request_pty do |ch, success|
             raise SshError.new "Could not obtain SSH pty " if !success
           end
@@ -29,11 +32,19 @@ module Puter
           channel.exec(actual_cmd) do |ch, success|
             raise SshError.new "Could not execute command [ #{actual_cmd} ]" if !success
             channel.on_data do |ch, data|
-              stdout_data += data
+              if output
+                output.call(:stdout, data) if output
+              else
+                stdout_data += data
+              end
             end
 
             channel.on_extended_data do |ch, type, data|
-              stderr_data += data
+              if output
+                output.call(:stderr, data) if output
+              else
+                stderr_data += data
+              end
             end
 
             channel.on_request("exit-status") do |ch, data|

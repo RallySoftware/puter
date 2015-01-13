@@ -30,19 +30,6 @@ module Puter
         vmonkey.vm!(path).destroy
       end
 
-      private
-
-      def do_puterfile(vm, context, puterfile)
-        puterfile.executable_ops.each do |op|
-          case op[:operation]
-          when Puter::Puterfile::RUN
-            @logger.info "I would RUN (#{op[:start_line]}, #{op[:end_line]}): #{op[:operation]} #{op[:data]}"
-          when Puter::Puterfile::ADD
-            @logger.info "I would ADD (#{op[:start_line]}, #{op[:end_line]}): #{op[:operation]} #{op[:from]} TO #{op[:to]}"
-          end
-        end
-      end
-
       def vmonkey
         @vmonkey ||= VMonkey.connect
       end

@@ -16,6 +16,10 @@ module Puter
     def self.run_cli(&block)
       begin
         block.call
+      rescue Puter::RunError => re
+        Puter.ui.error re.message
+        Puter.ui.error re.result.inspect
+        Puter.ui.error re.backtrace.join "\n"
       rescue Exception => e
         Puter.ui.error e.message
         Puter.ui.error e.backtrace.join "\n"

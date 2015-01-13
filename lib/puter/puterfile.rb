@@ -2,6 +2,14 @@ module Puter
   class SyntaxError < Exception
   end
 
+  class RunError < Exception
+    attr_accessor :result
+    def initialize(message, result)
+      super(message)
+      @result = result
+    end
+  end
+
   class Puterfile
 
     attr_accessor :raw
@@ -126,19 +134,38 @@ module Puter
 
     end
 
-    def apply(context, backend)
+    def apply(context, backend, ui)
       dependency_check(context)
+      ret = { :exit_status => 0, :exit_signal => nil }
 
       executable_ops.each do |op|
         case op[:operation]
         when ADD
           backend.add path_in_context(op[:from], context), op[:to]
         when RUN
-          backend.run op[:data]
-        else
-          raise "dunno what to do #{op.inspect}"
+          ret = backend.run op[:data] do | type, data |
+            case type
+            when :stderr
+              ui.error data
+            when :stdout
+              ui.info data
+            end
+          end
+
+          if ret[:exit_status] != 0
+            line = "#{op[:start_line]+1}"
+            plural = ""
+            if op[:start_line] != op[:end_line]
+              line << "..#{op[:end_line]+1}"
+              plural = "s"
+            end
+
+            raise RunError.new "On line#{plural} #{line}: RUN command exited non-zero.", ret
+          end
         end
       end
+
+      ret
     end
 
     private

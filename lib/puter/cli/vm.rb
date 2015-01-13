@@ -27,7 +27,7 @@ module Puter
 
           vm.host(vm_name) do |host|
             backend = Puter::Backend::Ssh.new(host, Puter::CLI::SSH_OPTS)
-            puterfile.apply(context, backend)
+            ret = puterfile.apply(context, backend, Puter.ui)
           end
         end
       end
