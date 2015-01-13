@@ -5,10 +5,6 @@ module Puter
   module Provider
     class Vm
 
-      def initialize(logger)
-        @logger = logger
-      end
-
       def images(path)
         vmonkey.folder!(path).templates.collect(&:name)
       end
@@ -18,8 +14,19 @@ module Puter
         block.call(target.guest_ip)
       end
 
-      def build(name, context, templates_path, puterfile)
-        @logger.info "would build here: [#{name}, #{context}, #{templates_path}, #{puterfile.from}]"
+      def build(name, template_name, opts, &block)
+        template = vmonkey.vm! template_name
+        if opts[:force]
+          target = template.clone_to! name
+        else
+          target = template.clone_to name
+        end
+
+        target.start
+        target.wait_for_port 22
+        block.call(target.guest_ip)
+        target.stop
+        target.MarkAsTemplate()
       end
 
       def rmi(path)

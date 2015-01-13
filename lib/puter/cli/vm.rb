@@ -23,36 +23,42 @@ module Puter
       LONGDESC
       def apply(vm_name, context)
         CLI.run_cli do
-          puterfile = Puter::Puterfile.from_path( File.expand_path('Puterfile', context) )
+          puterfile_path = File.expand_path 'Puterfile', context
+          puterfile = Puter::Puterfile.from_path puterfile_path
 
           vm.host(vm_name) do |host|
+            Puter.ui.info "Applying '#{puterfile_path}' to '#{vm_name}' at #{host}"
             backend = Puter::Backend::Ssh.new(host, Puter::CLI::SSH_OPTS)
             ret = puterfile.apply(context, backend, Puter.ui)
           end
+          Puter.ui.info "Successfully applied '#{puterfile_path}' to '#{vm_name}' at #{host}"
         end
       end
 
-      # desc "build NAME CONTEXT", "Creates a new puter image."
-      # long_desc <<-LONGDESC
-      #   Builds a new puter image.
+      desc "build NAME CONTEXT", "Creates a new puter image."
+      long_desc <<-LONGDESC
+        Builds a new puter image.
 
-      #   With --templates option, looks for the Puterfile FROM image in the given vSphere folder.
-      #   With --rerun option, re-runs the Puterfile on an existing VM.
-      # LONGDESC
-      # option :templates, :type => :string,  :default => '/Templates', :banner => "/path/to/puter/templates"
-      # option :rerun,     :type => :boolean, :default => false
-      # def build(name, context, opts = options)
-      #   CLI.run_cli do
-      #     puterfile = Puter::Puterfile.from_path( File.expand_path('Puterfile', context) )
-      #     backend = Puter::Backend::Ssh.new
+        With --templates option, looks for the Puterfile FROM image in the given vSphere folder.
+      LONGDESC
+      option :templates, :type => :string,  :default => '/Templates', :banner => "/path/to/puter/templates"
+      option :force, :type => :boolean,  :default => false, :banner => "overwrites NAME if it exists"
+      def build(vm_name, context, opts = options)
+        CLI.run_cli do
+          puterfile_path = File.expand_path 'Puterfile', context
+          puterfile = Puter::Puterfile.from_path puterfile_path
 
-      #     if opts[:rerun]
-      #       vm.rebuild(name, context, puterfile, backend)
-      #     else
-      #       vm.build(name, context, opts[:templates], puterfile, backend)
-      #     end
-      #   end
-      # end
+          Puter.ui.info "FROM '#{opts[:templates]}/#{puterfile.from}'"
+          Puter.ui.info "Waiting for SSH"
+          vm.build(vm_name, "#{opts[:templates]}/#{puterfile.from}", opts) do |host|
+            Puter.ui.info "Applying '#{puterfile_path}' to '#{vm_name}' at #{host}"
+            backend = Puter::Backend::Ssh.new(host, Puter::CLI::SSH_OPTS)
+            ret = puterfile.apply(context, backend, Puter.ui)
+            Puter.ui.info "Stopping '#{vm_name}'"
+          end
+          Puter.ui.info "Successfully built '#{vm_name}'"
+        end
+      end
 
       desc "rmi NAME", "Removes (deletes) a puter image."
       long_desc <<-LONGDESC
@@ -84,7 +90,7 @@ module Puter
       private
 
       def vm
-        @vm ||= Puter::Provider::Vm.new(Puter.ui)
+        @vm ||= Puter::Provider::Vm.new
       end
     end
   end

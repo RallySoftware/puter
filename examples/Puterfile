@@ -17,8 +17,4 @@ RUN touch /tmp/puter.txt && \
 RUN echo puter1 >> /tmp/puter.txt
 
 RUN echo complete
-RUN exit 3
-RUN false && \
-    true
-RUN echo should not run >&2
-RUN for i in `seq 1 4`; do echo $i; sleep 1; done;
+RUN for i in `seq 1 5`; do echo $i; sleep 1; done;
