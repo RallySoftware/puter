@@ -69,8 +69,8 @@ module Puter
       option :templates, :type => :string, :default => '/Templates', :banner => '/path/to/puter/templates'
       def rmi(name, templates_path = options[:templates])
         CLI.run_cli do
-          ## TODO do some UI output
           vm.rmi "#{templates_path}/#{name}"
+          Puter.ui.info "Removed image '#{name}'"
         end
       end
 
@@ -82,8 +82,8 @@ module Puter
       LONGDESC
       def rm(name)
         CLI.run_cli do
-          ## TODO do some UI output
           vm.rm name
+          Puter.ui.info "Removed instance '#{name}'"
         end
       end
 
