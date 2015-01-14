@@ -12,7 +12,7 @@ module Puter
       say(message, color)
     end
 
-    def remote_stdout(message, color = :blue)
+    def remote_stdout(message, color = :white)
       say(message, color)
     end
 
