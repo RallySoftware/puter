@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-its'
 
   spec.add_dependency 'thor', '~> 0.18'
-  spec.add_dependency 'vmonkey', '~> 0.11'
+  spec.add_dependency 'vmonkey', '~> 0.12'
   spec.add_dependency 'net-ssh', '~> 2.9'
   spec.add_dependency 'net-scp', '~> 1.2'
 end
