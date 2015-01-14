@@ -19,7 +19,6 @@ module Puter
       rescue Puter::RunError => re
         Puter.ui.error re.message
         Puter.ui.error "[ #{re.cmd} ] returned [ #{re.exit_status} ]"
-        Puter.ui.error re.backtrace.join "\n"
         exit re.exit_status
       rescue Exception => e
         Puter.ui.error e.message

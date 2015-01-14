@@ -11,5 +11,14 @@ module Puter
     def error(message, color = :red)
       say(message, color)
     end
+
+    def remote_stdout(message, color = :blue)
+      say(message, color)
+    end
+
+    def remote_stderr(message, color = :orange)
+      say(message, color)
+    end
+
   end
 end

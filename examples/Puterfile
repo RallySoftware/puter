@@ -1,5 +1,6 @@
 FROM c65.small
 #comment
+# MAINTAINER Brian Dupras <brian@duprasville.com>
 
 RUN touch /tmp/puter.txt
 RUN userdel -f puter1; useradd puter1

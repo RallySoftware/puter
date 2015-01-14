@@ -31,7 +31,7 @@ module Puter
             backend = Puter::Backend::Ssh.new(host, Puter::CLI::SSH_OPTS)
             ret = puterfile.apply(context, backend, Puter.ui)
           end
-          Puter.ui.info "Successfully applied '#{puterfile_path}' to '#{vm_name}' at #{host}"
+          Puter.ui.info "Successfully applied '#{puterfile_path}' to '#{vm_name}'"
         end
       end
 

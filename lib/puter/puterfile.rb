@@ -120,7 +120,7 @@ module Puter
         execs = []
         operations.each_with_index do |op, i|
           case op[:operation]
-          when ADD, RUN
+          when ADD, RUN, FROM
             exec = {
               :operation => op[:operation],
               :data      => op[:data].dup
@@ -147,7 +147,9 @@ module Puter
       dependency_check(context)
       ret = { :exit_status => 0, :exit_signal => nil }
 
-      executable_ops.each do |op|
+      executable_ops.each_with_index do |op, step|
+        ui.info "Step #{step} : #{op[:operation].to_s.upcase} #{op[:data]}"
+
         case op[:operation]
         when ADD
           backend.add path_in_context(op[:from], context), op[:to]
@@ -155,9 +157,9 @@ module Puter
           ret = backend.run op[:data] do | type, data |
             case type
             when :stderr
-              ui.error data
+              ui.remote_stderr data
             when :stdout
-              ui.info data
+              ui.remote_stdout data
             end
           end
 
