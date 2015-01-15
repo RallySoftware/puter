@@ -16,7 +16,7 @@ module Puter
         end
       end
 
-      desc "apply NAME CONTEXT", "Applies Puterfile to an existing & running VM"
+      desc "apply INSTANCE CONTEXT", "Applies Puterfile to an existing & running VM"
       method_option *instances_option
       def apply(instance_name, context)
         CLI.run_cli do
@@ -33,7 +33,7 @@ module Puter
         end
       end
 
-      desc "build NAME CONTEXT", "Builds a new Puter image"
+      desc "build IMAGE CONTEXT", "Builds a new Puter image"
       method_option *images_option
       method_option *build_option
       option :force,  :type => :boolean,  :default => false, :description => "Replaces Image specified by NAME if it exists"
@@ -57,7 +57,7 @@ module Puter
         end
       end
 
-      desc "rmi NAME", "Removes (deletes) a Puter image"
+      desc "rmi IMAGE", "Removes (deletes) a Puter image"
       method_option *images_option
       def rmi(image_name)
         image_path = "#{options[:images]}/#{image_name}"
@@ -67,7 +67,7 @@ module Puter
         end
       end
 
-      desc "create IMAGE NAME", "Creates (clones) a Puter instance from IMAGE as NAME"
+      desc "create IMAGE INSTANCE", "Creates (clones) a Puter instance from IMAGE as NAME"
       method_option *images_option
       method_option *instances_option
       option :force,  :type => :boolean,  :default => false, :description => "Replaces Instance specified by NAME if it exists"
@@ -90,7 +90,7 @@ module Puter
         end
       end
 
-      desc "start NAME", "Starts a Puter instance"
+      desc "start INSTANCE", "Starts a Puter instance"
       method_option *instances_option
       def start(instance_name)
         CLI.run_cli do
@@ -103,7 +103,7 @@ module Puter
         end
       end
 
-      desc "rm NAME", "Removes (deletes) a Puter instance"
+      desc "rm INSTANCE", "Removes (deletes) a Puter instance"
       method_option *instances_option
       def rm(instance_name)
         CLI.run_cli do
