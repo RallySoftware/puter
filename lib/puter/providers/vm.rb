@@ -19,12 +19,14 @@ module Puter
         block.call(target.guest_ip)
       end
 
-      def build(build_name, image_name, template_name, opts, &block)
+      def build(build_path, image_path, template_name, opts, &block)
+        vmonkey.folder('/').mk_parent_folder build_path
+
         template = vmonkey.vm! template_name
         if opts[:force]
-          build = template.clone_to! build_name
+          build = template.clone_to! build_path
         else
-          build = template.clone_to build_name
+          build = template.clone_to build_path
         end
 
         build.start
@@ -33,10 +35,12 @@ module Puter
         build.stop
         build.MarkAsTemplate()
 
+        vmonkey.folder('/').mk_parent_folder image_path
+
         if opts[:force]
-          build.move_to! image_name
+          build.move_to! image_path
         else
-          build.move_to image_name
+          build.move_to image_path
         end
       end
 
@@ -44,11 +48,13 @@ module Puter
         vmonkey.template!(path).destroy
       end
 
-      def create(image_name, instance_name, opts)
+      def create(image_path, instance_path, opts)
+        vmonkey.folder('/').mk_parent_folder instance_path
+
         if opts[:force]
-          vmonkey.vm!(image_name).clone_to! instance_name
+          vmonkey.vm!(image_path).clone_to! instance_path
         else
-          vmonkey.vm!(image_name).clone_to instance_name
+          vmonkey.vm!(image_path).clone_to instance_path
         end
       end
 
