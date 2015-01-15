@@ -4,9 +4,9 @@ require 'puter/backend/ssh'
 module Puter
   module CLI
     class Vm < Thor
-      desc 'images', 'Lists available puter images.'
+      desc 'images', 'Lists available Puter images.'
       long_desc <<-LONGDESC
-        Lists available puter images.
+        Lists available Puter images.
 
         With --images option, lists images found in the given vSphere folder.
       LONGDESC
@@ -17,7 +17,7 @@ module Puter
         end
       end
 
-      desc "apply NAME CONTEXT", "Applies Puterfile to an existing & running VM."
+      desc "apply NAME CONTEXT", "Applies Puterfile to an existing & running VM"
       long_desc <<-LONGDESC
         Applies Puterfile to an existing & running VM.
 
@@ -39,9 +39,9 @@ module Puter
         end
       end
 
-      desc "build NAME CONTEXT", "Creates a new puter image."
+      desc "build NAME CONTEXT", "Creates a new Puter image"
       long_desc <<-LONGDESC
-        Builds a new puter image.
+        Builds a new Puter image.
 
         With --images option, looks for the Puterfile FROM image in the given vSphere folder.
         With --build option, uses the given vSphere folder as a working folder.
@@ -69,9 +69,9 @@ module Puter
         end
       end
 
-      desc "rmi NAME", "Removes (deletes) a puter image."
+      desc "rmi NAME", "Removes (deletes) a Puter image"
       long_desc <<-LONGDESC
-        Removes (deletes) a puter image.
+        Removes (deletes) a Puter image.
 
         With --images option, looks for image in the given vSphere folder.
       LONGDESC
@@ -83,9 +83,9 @@ module Puter
         end
       end
 
-      desc "create IMAGE NAME", "Creates (clones) a puter instance from IMAGE as NAME."
+      desc "create IMAGE NAME", "Creates (clones) a Puter instance from IMAGE as NAME"
       long_desc <<-LONGDESC
-        Creates (clones) a puter instance from IMAGE as NAME.
+        Creates (clones) a Puter instance from IMAGE as NAME.
 
         With --images option, looks for the Puterfile FROM image in the given vSphere folder.
         With --instances option, operates on instances in the given vSphere folder.
@@ -117,9 +117,9 @@ module Puter
         end
       end
 
-      desc "start NAME", "Runs a Puter instance."
+      desc "start NAME", "Starts a Puter instance"
       long_desc <<-LONGDESC
-        Runs a Puter instance.
+        Starts a Puter instance and waits for SSH.  If instance is already started, then no action is taken.
 
         With --instances option, operates on instances in the given vSphere folder.
       LONGDESC
@@ -135,9 +135,9 @@ module Puter
         end
       end
 
-      desc "rm NAME", "Removes (deletes) a puter instance."
+      desc "rm NAME", "Removes (deletes) a Puter instance"
       long_desc <<-LONGDESC
-        Removes (deletes) a puter instance.
+        Removes (deletes) a Puter instance.
 
         With --instances option, operates on instances in the given vSphere folder.
       LONGDESC
