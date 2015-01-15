@@ -18,18 +18,18 @@ module Puter
 
       desc "apply NAME CONTEXT", "Applies Puterfile to an existing & running VM"
       method_option *instances_option
-      def apply(vm_name, context)
+      def apply(instance_name, context)
         CLI.run_cli do
-          vm_path = "#{options[:instances]}/#{vm_name}"
+          instance_path = "#{options[:instances]}/#{instance_name}"
           puterfile_path = File.expand_path 'Puterfile', context
           puterfile = Puter::Puterfile.from_path puterfile_path
 
-          vm.host(vm_path) do |host|
-            Puter.ui.info "Applying '#{puterfile_path}' to '#{vm_path}' at #{host}"
+          vm.host(instance_path) do |host|
+            Puter.ui.info "Applying '#{puterfile_path}' to '#{instance_path}' at #{host}"
             backend = Puter::Backend::Ssh.new(host, Puter::CLI::SSH_OPTS)
             ret = puterfile.apply(context, backend, Puter.ui)
           end
-          Puter.ui.info "Successfully applied '#{puterfile_path}' to '#{vm_name}'"
+          Puter.ui.info "Successfully applied '#{puterfile_path}' to '#{instance_name}'"
         end
       end
 
@@ -37,21 +37,21 @@ module Puter
       method_option *images_option
       method_option *build_option
       option :force,  :type => :boolean,  :default => false, :banner => "replaces Image specified by NAME if it exists"
-      def build(image_name, context, opts = options)
+      def build(image_name, context)
         CLI.run_cli do
           build_path = "#{options[:build]}/#{image_name}"
-          image_path = "#{options[:images]}/#{image_name}"
+          images_path = "#{options[:images]}/#{image_name}"
 
           puterfile_path = File.expand_path 'Puterfile', context
           puterfile = Puter::Puterfile.from_path puterfile_path
 
-          Puter.ui.info "Building '#{images_path}' FROM '#{opts[:images]}/#{puterfile.from}'"
+          Puter.ui.info "Building '#{images_path}' FROM '#{options[:images]}/#{puterfile.from}'"
           Puter.ui.info "Waiting for SSH"
-          vm.build(build_path, image_path, "#{opts[:images]}/#{puterfile.from}", opts) do |host|
+          vm.build(build_path, images_path, "#{options[:images]}/#{puterfile.from}", options) do |host|
             Puter.ui.info "Applying '#{puterfile_path}' to '#{build_path}' at #{host}"
             backend = Puter::Backend::Ssh.new(host, Puter::CLI::SSH_OPTS)
             ret = puterfile.apply(context, backend, Puter.ui)
-            Puter.ui.info "Stopping '#{build_path}' and moving to '#{image_path}'"
+            Puter.ui.info "Stopping '#{build_path}' and moving to '#{images_path}'"
           end
           Puter.ui.info "Successfully built '#{image_name}'"
         end
@@ -59,10 +59,11 @@ module Puter
 
       desc "rmi NAME", "Removes (deletes) a Puter image"
       method_option *images_option
-      def rmi(name, images_path = options[:images])
+      def rmi(image_name)
+        image_path = "#{options[:images]}/#{image_name}"
         CLI.run_cli do
-          vm.rmi "#{images_path}/#{name}"
-          Puter.ui.info "Removed image '#{name}'"
+          vm.rmi image_path
+          Puter.ui.info "Removed image '#{image_path}'"
         end
       end
 
@@ -103,10 +104,11 @@ module Puter
 
       desc "rm NAME", "Removes (deletes) a Puter instance"
       method_option *instances_option
-      def rm(name)
+      def rm(instance_name)
         CLI.run_cli do
-          vm.rm name
-          Puter.ui.info "Removed instance '#{name}'"
+          instance_path = "#{options[:instances]}/#{instance_name}"
+          vm.rm instance_path
+          Puter.ui.info "Removed instance '#{instance_path}'"
         end
       end
 
