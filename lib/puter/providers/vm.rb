@@ -59,17 +59,26 @@ module Puter
       end
 
       def start(instance_name, &block)
-        instance = vmonkey.vm!(instance_name)
+        instance = vmonkey.vm! instance_name
         instance.start
         instance.wait_for_port 22
         block.call(instance.guest_ip) if block
+      end
+
+      def stop(instance_name)
+        instance = vmonkey.vm! instance_name
+        instance.stop
+      end
+
+      def kill(instance_name)
+        instance = vmonkey.vm! instance_name
+        instance.kill
       end
 
       def ps(instances_path, all, sub="")
         folder = vmonkey.folder! instances_path
         instances = folder.vms
         instances.select! { |vm| vm.runtime.powerState == 'poweredOn' } unless all
-        # instances.collect(&:name)
 
         ret = instances.collect { |i| "#{sub}#{i.name}" }
         folder.folders.each do |sub_folder|

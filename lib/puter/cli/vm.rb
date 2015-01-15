@@ -103,6 +103,30 @@ module Puter
         end
       end
 
+      desc "stop INSTANCE", "Stops a Puter instance"
+      method_option *instances_option
+      def stop(instance_name)
+        CLI.run_cli do
+          instance_path = "#{options[:instances]}/#{instance_name}"
+
+          Puter.ui.info "Stopping instance '#{instance_path}', waiting for shutdown..."
+          vm.stop instance_path
+          Puter.ui.info "Stopped '#{instance_path}'."
+        end
+      end
+
+      desc "kill INSTANCE", "Kills a Puter instance"
+      method_option *instances_option
+      def kill(instance_name)
+        CLI.run_cli do
+          instance_path = "#{options[:instances]}/#{instance_name}"
+
+          Puter.ui.info "Killing instance '#{instance_path}'"
+          vm.kill instance_path
+          Puter.ui.info "Killed '#{instance_path}'."
+        end
+      end
+
       desc "rm INSTANCE", "Removes (deletes) a Puter instance"
       method_option *instances_option
       def rm(instance_name)
