@@ -5,8 +5,13 @@ module Puter
   module Provider
     class Vm
 
-      def images(path)
-        vmonkey.folder!(path).templates.collect(&:name)
+      def images(path, sub="")
+        folder = vmonkey.folder!(path)
+        imgs = folder.templates.collect { |t| "#{sub}#{t.name}" }
+        folder.folders.each do |sub_folder|
+          imgs += images("#{path}/#{sub_folder.name}", "#{sub}#{sub_folder.name}/")
+        end
+        imgs
       end
 
       def host(name, &block)
@@ -54,10 +59,17 @@ module Puter
         block.call(instance.guest_ip) if block
       end
 
-      def ps(instances_path, all)
-        instances = vmonkey.folder!(instances_path).vms
+      def ps(instances_path, all, sub="")
+        folder = vmonkey.folder! instances_path
+        instances = folder.vms
         instances.select! { |vm| vm.runtime.powerState == 'poweredOn' } unless all
-        instances.collect(&:name)
+        # instances.collect(&:name)
+
+        ret = instances.collect { |i| "#{sub}#{i.name}" }
+        folder.folders.each do |sub_folder|
+          ret += ps("#{instances_path}/#{sub_folder.name}", all, "#{sub}#{sub_folder.name}/")
+        end
+        ret
       end
 
       def rm(path)
