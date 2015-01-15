@@ -4,13 +4,12 @@ require 'puter/backend/ssh'
 module Puter
   module CLI
     class Vm < Thor
-      desc 'images', 'Lists available Puter images.'
-      long_desc <<-LONGDESC
-        Lists available Puter images.
+      images_option =    [:images,    {:type => :string, :default => '/Puter/Images',    :banner => '/path/to/Puter/Images',    :desc => 'Override the default Images vSphere folder.'    }]
+      instances_option = [:instances, {:type => :string, :default => '/Puter/Instances', :banner => '/path/to/Puter/Instances', :desc => 'Override the default Instances vSphere folder.' }]
+      build_option =     [:build,     {:type => :string, :default => '/Puter/Build',     :banner => '/path/to/Puter/Build',     :desc => 'Override the default Build vSphere folder.'     }]
 
-        With --images option, lists images found in the given vSphere folder.
-      LONGDESC
-      option :images, :type => :string, :default => '/Puter/Images', :banner => '/path/to/Puter/Images'
+      desc 'images', 'Lists available Puter images.'
+      method_option *images_option
       def images()
         CLI.run_cli do
           vm.images(options[:images]).each { |i| Puter.ui.info i }
@@ -18,12 +17,7 @@ module Puter
       end
 
       desc "apply NAME CONTEXT", "Applies Puterfile to an existing & running VM"
-      long_desc <<-LONGDESC
-        Applies Puterfile to an existing & running VM.
-
-        With --instances option, operates on instances in the given vSphere folder.
-      LONGDESC
-      option :instances, :type => :string, :default => '/Puter/Instances', :banner => '/path/to/Puter/Instances'
+      method_option *instances_option
       def apply(vm_name, context)
         CLI.run_cli do
           vm_path = "#{options[:instances]}/#{vm_name}"
@@ -40,15 +34,9 @@ module Puter
       end
 
       desc "build NAME CONTEXT", "Creates a new Puter image"
-      long_desc <<-LONGDESC
-        Builds a new Puter image.
-
-        With --images option, looks for the Puterfile FROM image in the given vSphere folder.
-        With --build option, uses the given vSphere folder as a working folder.
-      LONGDESC
-      option :images, :type => :string, :default => '/Puter/Images', :banner => '/path/to/Puter/Images'
-      option :build,  :type => :string, :default => '/Puter/Build',  :banner => '/path/to/Puter/Build'
-      option :force,  :type => :boolean,  :default => false, :banner => "overwrites NAME if it exists"
+      method_option *images_option
+      method_option *build_option
+      option :force,  :type => :boolean,  :default => false, :banner => "replaces Image specified by NAME if it exists"
       def build(image_name, context, opts = options)
         CLI.run_cli do
           build_path = "#{options[:build]}/#{image_name}"
@@ -70,12 +58,7 @@ module Puter
       end
 
       desc "rmi NAME", "Removes (deletes) a Puter image"
-      long_desc <<-LONGDESC
-        Removes (deletes) a Puter image.
-
-        With --images option, looks for image in the given vSphere folder.
-      LONGDESC
-      option :images, :type => :string, :default => '/Puter/Images', :banner => '/path/to/puter/images'
+      method_option *images_option
       def rmi(name, images_path = options[:images])
         CLI.run_cli do
           vm.rmi "#{images_path}/#{name}"
@@ -84,14 +67,8 @@ module Puter
       end
 
       desc "create IMAGE NAME", "Creates (clones) a Puter instance from IMAGE as NAME"
-      long_desc <<-LONGDESC
-        Creates (clones) a Puter instance from IMAGE as NAME.
-
-        With --images option, looks for the Puterfile FROM image in the given vSphere folder.
-        With --instances option, operates on instances in the given vSphere folder.
-      LONGDESC
-      option :images, :type => :string, :default => '/Puter/Images', :banner => '/path/to/Puter/Images'
-      option :instances, :type => :string, :default => '/Puter/Instances', :banner => '/path/to/Puter/Instances'
+      method_option *images_option
+      method_option *instances_option
       def create(image_name, instance_name)
         CLI.run_cli do
           image_path = "#{options[:images]}/#{image_name}"
@@ -103,14 +80,8 @@ module Puter
       end
 
       desc "ps", "Lists Puter instances"
-      long_desc <<-LONGDESC
-        Lists Puter instances.
-
-        With --all option, lists stopped instances.
-        With --instances option, operates on instances in the given vSphere folder.
-      LONGDESC
-      option :instances, :type => :string, :default => '/Puter/Instances', :banner => '/path/to/Puter/Instances'
-      option :all, :type => :boolean, :default => false
+      method_option *instances_option
+      option :all, :type => :boolean, :default => false, :description => 'Includes non-running instances.'
       def ps()
         CLI.run_cli do
           vm.ps(options[:instances], options[:all]).each { |i| Puter.ui.info i }
@@ -118,12 +89,7 @@ module Puter
       end
 
       desc "start NAME", "Starts a Puter instance"
-      long_desc <<-LONGDESC
-        Starts a Puter instance and waits for SSH.  If instance is already started, then no action is taken.
-
-        With --instances option, operates on instances in the given vSphere folder.
-      LONGDESC
-      option :instances, :type => :string, :default => '/Puter/Instances', :banner => '/path/to/Puter/Instances'
+      method_option *instances_option
       def start(instance_name)
         CLI.run_cli do
           instance_path = "#{options[:instances]}/#{instance_name}"
@@ -136,12 +102,7 @@ module Puter
       end
 
       desc "rm NAME", "Removes (deletes) a Puter instance"
-      long_desc <<-LONGDESC
-        Removes (deletes) a Puter instance.
-
-        With --instances option, operates on instances in the given vSphere folder.
-      LONGDESC
-      option :instances, :type => :string, :default => '/Puter/Instances', :banner => '/path/to/Puter/Instances'
+      method_option *instances_option
       def rm(name)
         CLI.run_cli do
           vm.rm name
