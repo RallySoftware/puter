@@ -33,10 +33,10 @@ module Puter
         end
       end
 
-      desc "build NAME CONTEXT", "Creates a new Puter image"
+      desc "build NAME CONTEXT", "Builds a new Puter image"
       method_option *images_option
       method_option *build_option
-      option :force,  :type => :boolean,  :default => false, :banner => "replaces Image specified by NAME if it exists"
+      option :force,  :type => :boolean,  :default => false, :description => "Replaces Image specified by NAME if it exists"
       def build(image_name, context)
         CLI.run_cli do
           build_path = "#{options[:build]}/#{image_name}"
@@ -70,12 +70,13 @@ module Puter
       desc "create IMAGE NAME", "Creates (clones) a Puter instance from IMAGE as NAME"
       method_option *images_option
       method_option *instances_option
+      option :force,  :type => :boolean,  :default => false, :description => "Replaces Instance specified by NAME if it exists"
       def create(image_name, instance_name)
         CLI.run_cli do
           image_path = "#{options[:images]}/#{image_name}"
           instance_path = "#{options[:instances]}/#{instance_name}"
 
-          vm.create image_path, instance_path
+          vm.create image_path, instance_path, options
           Puter.ui.info "Created instance '#{instance_path}' from '#{image_path}'"
         end
       end

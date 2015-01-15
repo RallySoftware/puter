@@ -39,8 +39,12 @@ module Puter
         vmonkey.template!(path).destroy
       end
 
-      def create(image_name, instance_name)
-        vmonkey.vm!(image_name).clone_to instance_name
+      def create(image_name, instance_name, opts)
+        if opts[:force]
+          vmonkey.vm!(image_name).clone_to! instance_name
+        else
+          vmonkey.vm!(image_name).clone_to instance_name
+        end
       end
 
       def start(instance_name, &block)
