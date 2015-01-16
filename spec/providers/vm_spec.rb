@@ -1,4 +1,3 @@
-# require 'spec_helper'
 # require_relative '../../lib/puter/providers/vm'
 
 # # note - we're assuming a .vmonkey for now that really goes to vsphere, need to think about mocking

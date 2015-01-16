@@ -73,14 +73,14 @@ describe Puter::Puterfile do
 
           # comment
           RUN echo foo
-          ADD afile tofile
+          COPY afile tofile
 
           RUN yum install \\
               # comment line in a continuation \\
               package1 \\
               package2
 
-          ADD https://really/long/url/foo.tar.gz \\
+          COPY https://really/long/url/foo.tar.gz \\
               /tmp/foo.tar.gz
           EOF
       end
@@ -89,7 +89,7 @@ describe Puter::Puterfile do
       specify { expect(subject.operations[1][:operation]).to eq(Puter::Puterfile::BLANK) }
       specify { expect(subject.operations[2][:operation]).to eq(Puter::Puterfile::COMMENT) }
       specify { expect(subject.operations[3][:operation]).to eq(Puter::Puterfile::RUN) }
-      specify { expect(subject.operations[4][:operation]).to eq(Puter::Puterfile::ADD) }
+      specify { expect(subject.operations[4][:operation]).to eq(Puter::Puterfile::COPY) }
       specify { expect(subject.operations[5][:operation]).to eq(Puter::Puterfile::BLANK) }
       specify { expect(subject.operations[6][:operation]).to eq(Puter::Puterfile::RUN) }
       specify { expect(subject.operations[6][:data]).to eq('yum install  ') }
@@ -111,7 +111,7 @@ describe Puter::Puterfile do
       specify { expect(subject.executable_ops[1][:start_line]).to eq(3) }
       specify { expect(subject.executable_ops[1][:end_line]).to eq(3) }
 
-      specify { expect(subject.executable_ops[2][:operation]).to eq(Puter::Puterfile::ADD) }
+      specify { expect(subject.executable_ops[2][:operation]).to eq(Puter::Puterfile::COPY) }
       specify { expect(subject.executable_ops[2][:data]).to match(/afile/) }
       specify { expect(subject.executable_ops[2][:start_line]).to eq(4) }
       specify { expect(subject.executable_ops[2][:end_line]).to eq(4) }
@@ -121,7 +121,7 @@ describe Puter::Puterfile do
       specify { expect(subject.executable_ops[3][:start_line]).to eq(6) }
       specify { expect(subject.executable_ops[3][:end_line]).to eq(9) }
 
-      specify { expect(subject.executable_ops[4][:operation]).to eq(Puter::Puterfile::ADD) }
+      specify { expect(subject.executable_ops[4][:operation]).to eq(Puter::Puterfile::COPY) }
       specify { expect(subject.executable_ops[4][:from]).to eq('https://really/long/url/foo.tar.gz') }
       specify { expect(subject.executable_ops[4][:to]).to eq('/tmp/foo.tar.gz') }
       specify { expect(subject.executable_ops[4][:start_line]).to eq(11) }
@@ -143,8 +143,8 @@ describe Puter::Puterfile do
       its(:message) { should match /line 2/ }
     end
 
-    context 'should raise a syntax error when ADD operation lacks two parameters' do
-      specify { expect { Puter::Puterfile.parse("FROM foo\nADD just_one\n") }.to raise_error Puter::SyntaxError }
+    context 'should raise a syntax error when COPY operation lacks two parameters' do
+      specify { expect { Puter::Puterfile.parse("FROM foo\nCOPY just_one\n") }.to raise_error Puter::SyntaxError }
     end
 
     context 'when the first line is not a FROM command' do

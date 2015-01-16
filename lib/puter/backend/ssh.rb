@@ -60,7 +60,7 @@ module Puter
         { :cmd => actual_cmd, :stdout => stdout_data, :stderr => stderr_data, :exit_status => exit_status, :exit_signal => exit_signal }
       end
 
-      def add(from, to)
+      def copy(from, to)
         @scp.upload! from, to
       end
 

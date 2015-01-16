@@ -10,7 +10,7 @@ describe Puter::Puterfile do
 
           # comment
           RUN echo foo
-          ADD afile tofile
+          COPY afile tofile
 
           EOF
         )

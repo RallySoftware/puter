@@ -1,14 +1,15 @@
 FROM c65.small
 #comment
 # MAINTAINER Brian Dupras <brian@duprasville.com>
+# VOLUME
 
 RUN touch /tmp/puter.txt
 RUN userdel -f puter1; useradd puter1
 RUN sudo -u puter1 whoami
 
-ADD localfile.txt /tmp/explicit_name.txt
+COPY localfile.txt /tmp/explicit_name.txt
 
-ADD localfile.txt \
+COPY localfile.txt \
     /home/puter1/
 
 RUN touch /tmp/puter.txt && \

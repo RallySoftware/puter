@@ -31,12 +31,12 @@ module Puter
 
     FROM     = :from
     RUN      = :run
-    ADD      = :add
+    COPY     = :copy
     BLANK    = :blank
     CONTINUE = :continue
     COMMENT  = :comment
 
-    COMMANDS = [ FROM, RUN, ADD ]
+    COMMANDS = [ FROM, RUN, COPY ]
 
     class << self
       def from_path(path)
@@ -98,7 +98,7 @@ module Puter
           op[:data]      = line.lstrip
           op[:continue]  = line[-1] == BACKSLASH
 
-        # must be an operation (FROM, ADD, RUN, ...)
+        # must be an operation (FROM, COPY, RUN, ...)
         else
           parts = line.split(/\s+/, 2)
           cmd = parts[0].downcase.to_sym
@@ -120,7 +120,7 @@ module Puter
         execs = []
         operations.each_with_index do |op, i|
           case op[:operation]
-          when ADD, RUN, FROM
+          when COPY, RUN, FROM
             exec = {
               :operation => op[:operation],
               :data      => op[:data].dup
@@ -133,9 +133,9 @@ module Puter
           end
         end
 
-        execs.select { |e| e[:operation] == ADD }.each do |e|
+        execs.select { |e| e[:operation] == COPY }.each do |e|
           e[:from], e[:to] = e[:data].strip.split /\s+/, 2
-          raise SyntaxError.new "ADD operation requires two parameters #{e.inspect}" if e[:from].nil? || e[:to].nil?
+          raise SyntaxError.new "COPY operation requires two parameters #{e.inspect}" if e[:from].nil? || e[:to].nil?
         end
 
         execs
@@ -151,8 +151,8 @@ module Puter
         ui.info "Step #{step} : #{op[:operation].to_s.upcase} #{op[:data]}"
 
         case op[:operation]
-        when ADD
-          backend.add path_in_context(op[:from], context), op[:to]
+        when COPY
+          backend.copy path_in_context(op[:from], context), op[:to]
         when RUN
           ret = backend.run op[:data] do | type, data |
             case type
@@ -187,7 +187,7 @@ module Puter
     def dependency_check(context)
       executable_ops.each do |op|
         case op[:operation]
-        when ADD
+        when COPY
           File.open(path_in_context(op[:from], context), 'r') {}
         end
       end
