@@ -80,8 +80,8 @@ describe Puter::Puterfile do
               package1 \\
               package2
 
-          COPY https://really/long/url/foo.tar.gz \\
-              /tmp/foo.tar.gz
+          COPY foo.tar.gz \\
+               /tmp/foo.tar.gz
           EOF
       end
 
@@ -122,7 +122,7 @@ describe Puter::Puterfile do
       specify { expect(subject.executable_ops[3][:end_line]).to eq(9) }
 
       specify { expect(subject.executable_ops[4][:operation]).to eq(Puter::Puterfile::COPY) }
-      specify { expect(subject.executable_ops[4][:from]).to eq('https://really/long/url/foo.tar.gz') }
+      specify { expect(subject.executable_ops[4][:from]).to eq('foo.tar.gz') }
       specify { expect(subject.executable_ops[4][:to]).to eq('/tmp/foo.tar.gz') }
       specify { expect(subject.executable_ops[4][:start_line]).to eq(11) }
       specify { expect(subject.executable_ops[4][:end_line]).to eq(12) }
