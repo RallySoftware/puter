@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Puter::VERSION
   spec.authors       = ['Brian Dupras', 'Dave Smith', 'Gerred Dillon']
   spec.email         = ['brian@duprasville.com', 'dawsmith8@gmail.com', 'hello@gerred.com']
-  spec.summary       = %q{To be determined.}
-  spec.description   = %q{To be determined.}
+  spec.summary       = %q{A tool to quickly and easily provision virtual machine images and instances directly on virtualization and cloud providers.}
+  spec.description   = %q{A tool to quickly and easily provision virtual machine images and instances directly on virtualization and cloud providers.}
   spec.homepage      = 'https://github.com/vmtricks/puter'
   spec.license       = 'MIT'
 
