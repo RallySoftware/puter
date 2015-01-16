@@ -1,34 +1,54 @@
-VMware Puter structure within a Datacenter
-  Puter/
-    Build/
-      # 'puter vm build' - uses this directory as a working folder
+## What's been implemented
 
-    Images/
-      # in all commands, NAME is relative to here
-      # 'puter vm images' - lists recursively
-      # 'puter vm build NAME' - builds a new VM image
-      #    Puterfile FROM is also relative to here e.g. FROM rallydev.com/os/centos5
-      # 'puter vm rmi NAME' - destroys a VM image
+VMware provider, using the vmonkey and rbvmomi APIs.
+Puterfile instructions: FROM, RUN, and COPY
+puter vm sub-commands: images, build, rmi, ps, create, start, stop, rm, apply
 
-      rallydev.com/
-        os/
-          coreos
-          centos5
-          centos6
-        platform/
-          docker_on_centos
-          java8_app_server
+## What needs to be implemented
 
-    Instances/
-      # in all commands, NAME is relative to here
-      # 'puter vm ps' - lists recursively (-a for stopped VMs, too)
-      # 'puter vm create IMAGE NAME' - IMAGE is relative to above
-      # 'puter vm start NAME' - starts a VM
-      # 'puter vm stop NAME' - stops a VM
-      # 'puter vm rm NAME' - destroys a vm
+### Enhance puter sub-commands
 
-      realtime/
-        bld-pigeon-01
-        bld-alm-01
+    `ps`     - detailed output, currently only names are output.
+    `images` - detailed output, currently only names are output.
 
-AWS Puter Structure, within an EC2 Region
+### Implement puter sub-commands
+
+    `version` -
+    `run`     - convenience for create & start
+    `restart` - guest OS restart
+    `exec`    - run a command on the guest OS
+    `inspect` - detailed metadata of an image/instance
+    `implode` - completely remove all Puter images, instances, and provider-specific metadata
+
+    `tag`     - maybe?
+    `import`  - maybe?  dups an existing non-Puter image (template, ami) into the set of Puter Images
+    `export`  - maybe?  dups an existing Puter Image to a non-Puter image (template, ami)
+
+
+### Implement Puterfile instructions
+
+    `MAINTAINER`
+    `USER`
+    `ENV`
+    `VOLUME`
+    `ADD`
+    `EXPOSE`
+    `ONBUILD`
+
+### Implement an AWS provider
+
+
+## VMware provider
+
+### VMware Puter structure within a Datacenter
+
+    <datacenter>/     # VMonkey config specifies the specific Datacenter to operate from
+      vmFolder/       #
+        Puter/        # top-level vSphere Folder - 'puter vm init' creates this folder
+          Build/      # this folder is used by 'puter vm build' as a working folder
+          Images/     # this folder is where Puter Images (VM templates) are stored
+          Instances/  # this folder is where Puter Images (running and stopped VMs) are stored
+
+## AWS Puter Structure, within an EC2 Region
+
+    tbd

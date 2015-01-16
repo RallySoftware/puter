@@ -1,22 +1,25 @@
 FROM c65.small
-#comment
-# MAINTAINER Brian Dupras <brian@duprasville.com>
-# VOLUME
+# Start with any base image on your virtualization provider
 
+# Run some simple commands
 RUN touch /tmp/puter.txt
 RUN userdel -f puter1; useradd puter1
 RUN sudo -u puter1 whoami
 
+# Copy some files to the new machine
 COPY localfile.txt /tmp/explicit_name.txt
 
-COPY localfile.txt \
-    /home/puter1/
+# Extend long lines with \ syntax
+COPY localfile_with_a_really_really_longname.txt \
+     /home/puter1/
 
+# Don't fear shell redirection and special characters
 RUN touch /tmp/puter.txt && \
-      echo more commands > /tmp/puter.txt && \
-      echo done
-
+    echo more commands > /tmp/puter.txt && \
+    echo done
 RUN echo puter1 >> /tmp/puter.txt
 
-RUN echo complete
+# output from long running commands is visible along the way
 RUN for i in `seq 1 5`; do echo $i; sleep 1; done;
+
+RUN echo complete
