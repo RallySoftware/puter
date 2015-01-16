@@ -100,27 +100,32 @@ describe Puter::Puterfile do
       specify { expect(subject.operations[8][:continue]).to be_truthy }
       specify { expect(subject.operations[9][:operation]).to eq(Puter::Puterfile::CONTINUE) }
 
-      specify { expect(subject.executable_ops.length).to eq(4) }
-      specify { expect(subject.executable_ops[0][:operation]).to eq(Puter::Puterfile::RUN) }
-      specify { expect(subject.executable_ops[0][:data]).to match(/echo foo/) }
-      specify { expect(subject.executable_ops[0][:start_line]).to eq(3) }
-      specify { expect(subject.executable_ops[0][:end_line]).to eq(3) }
+      specify { expect(subject.executable_ops.length).to eq(5) }
+      specify { expect(subject.executable_ops[0][:operation]).to eq(Puter::Puterfile::FROM) }
+      specify { expect(subject.executable_ops[0][:data]).to match(/scratch/) }
+      specify { expect(subject.executable_ops[0][:start_line]).to eq(0) }
+      specify { expect(subject.executable_ops[0][:end_line]).to eq(0) }
 
-      specify { expect(subject.executable_ops[1][:operation]).to eq(Puter::Puterfile::ADD) }
-      specify { expect(subject.executable_ops[1][:data]).to match(/afile/) }
-      specify { expect(subject.executable_ops[1][:start_line]).to eq(4) }
-      specify { expect(subject.executable_ops[1][:end_line]).to eq(4) }
+      specify { expect(subject.executable_ops[1][:operation]).to eq(Puter::Puterfile::RUN) }
+      specify { expect(subject.executable_ops[1][:data]).to match(/echo foo/) }
+      specify { expect(subject.executable_ops[1][:start_line]).to eq(3) }
+      specify { expect(subject.executable_ops[1][:end_line]).to eq(3) }
 
-      specify { expect(subject.executable_ops[2][:operation]).to eq(Puter::Puterfile::RUN) }
-      specify { expect(subject.executable_ops[2][:data]).to match(/yum install\s+package1\s+package2/) }
-      specify { expect(subject.executable_ops[2][:start_line]).to eq(6) }
-      specify { expect(subject.executable_ops[2][:end_line]).to eq(9) }
+      specify { expect(subject.executable_ops[2][:operation]).to eq(Puter::Puterfile::ADD) }
+      specify { expect(subject.executable_ops[2][:data]).to match(/afile/) }
+      specify { expect(subject.executable_ops[2][:start_line]).to eq(4) }
+      specify { expect(subject.executable_ops[2][:end_line]).to eq(4) }
 
-      specify { expect(subject.executable_ops[3][:operation]).to eq(Puter::Puterfile::ADD) }
-      specify { expect(subject.executable_ops[3][:from]).to eq('https://really/long/url/foo.tar.gz') }
-      specify { expect(subject.executable_ops[3][:to]).to eq('/tmp/foo.tar.gz') }
-      specify { expect(subject.executable_ops[3][:start_line]).to eq(11) }
-      specify { expect(subject.executable_ops[3][:end_line]).to eq(12) }
+      specify { expect(subject.executable_ops[3][:operation]).to eq(Puter::Puterfile::RUN) }
+      specify { expect(subject.executable_ops[3][:data]).to match(/yum install\s+package1\s+package2/) }
+      specify { expect(subject.executable_ops[3][:start_line]).to eq(6) }
+      specify { expect(subject.executable_ops[3][:end_line]).to eq(9) }
+
+      specify { expect(subject.executable_ops[4][:operation]).to eq(Puter::Puterfile::ADD) }
+      specify { expect(subject.executable_ops[4][:from]).to eq('https://really/long/url/foo.tar.gz') }
+      specify { expect(subject.executable_ops[4][:to]).to eq('/tmp/foo.tar.gz') }
+      specify { expect(subject.executable_ops[4][:start_line]).to eq(11) }
+      specify { expect(subject.executable_ops[4][:end_line]).to eq(12) }
     end
 
     context 'should raise a syntax error with a line number' do
