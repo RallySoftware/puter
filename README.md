@@ -6,8 +6,6 @@ instances directly on virtualization and cloud providers.
 Using a Puterfile syntax that closely resembles Dockerfile syntax, Puter makes
 it easy and familiar to create new base VM images.
 
-### Example Puterfile
-
 ## Usage Example
 Given a repo with the following structure:
 
